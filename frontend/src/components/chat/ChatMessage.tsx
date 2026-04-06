@@ -1,6 +1,6 @@
 "use client";
 
-import { Terminal, Copy, Check } from "lucide-react";
+import { Terminal, Copy, Check, FileText } from "lucide-react";
 import { useState, useCallback } from "react";
 import type { LocalMessage } from "@/hooks/useChat";
 
@@ -20,12 +20,23 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       )}
 
       <div className={`flex-1 max-w-2xl ${isUser ? "text-right" : ""}`}>
+        {/* Attachment Card */}
         {isUser && message.imageBase64 && (
-          <img
-            src={message.imageBase64}
-            alt="Attached"
-            className="rounded-xl max-h-64 ml-auto mb-2"
-          />
+          <div className={`flex gap-2 mb-2 ${isUser ? "justify-end" : "justify-start"}`}>
+            <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-2xl w-48 text-left">
+              <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden">
+                {message.fileType?.startsWith("image/") ? (
+                  <img src={message.imageBase64} className="object-cover w-full h-full" alt="Attached" />
+                ) : (
+                  <FileText className="w-5 h-5 text-blue-400" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-white truncate">{message.imageName || "Attached File"}</p>
+                <p className="text-[10px] text-zinc-500 uppercase">{message.imageName?.split(".").pop() || "FILE"}</p>
+              </div>
+            </div>
+          </div>
         )}
         <div
           className={`inline-block text-left px-4 py-3 rounded-2xl text-sm leading-relaxed ${

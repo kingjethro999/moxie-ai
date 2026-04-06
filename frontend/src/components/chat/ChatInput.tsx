@@ -1,31 +1,32 @@
 "use client";
 
 import { useState, useRef, useCallback, type KeyboardEvent } from "react";
-import { Send, Image as ImageIcon, X, Square } from "lucide-react";
+import { Send, Square, Plus, FileText, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ChatInputProps {
-  onSend: (content: string, imageBase64?: string | null) => void;
+  onSend: (content: string, imageBase64?: string | null, imageName?: string | null, fileType?: string | null) => void;
   onStop: () => void;
   isStreaming: boolean;
   isVisionModel: boolean;
   selectedModel: string;
   placeholder?: string;
-  hasLeftPadding?: boolean;
 }
 
 export default function ChatInput({
   onSend,
   onStop,
   isStreaming,
-  isVisionModel,
+  models, // Accept models list
+  selectedModel,
+  setSelectedModel,
   placeholder = "Ask Moxie anything...",
-  hasLeftPadding = false,
-}: ChatInputProps) {
+}: any) {
   const { user, loading } = useAuth();
   const [input, setInput] = useState("");
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
+  const [fileType, setFileType] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -34,7 +35,6 @@ export default function ChatInput({
       onStop();
       return;
     }
-
     if (!input.trim() && !imageBase64) return;
 
     if (!loading && !user) {
@@ -43,119 +43,126 @@ export default function ChatInput({
       return;
     }
 
-    onSend(input, imageBase64);
+    onSend(input, imageBase64, imageName, fileType);
     setInput("");
     setImageBase64(null);
     setImageName(null);
+    setFileType(null);
+    if (textareaRef.current) textareaRef.current.style.height = "auto";
   }, [input, imageBase64, isStreaming, onSend, onStop, user, loading]);
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        handleSend();
-      }
-    },
-    [handleSend]
-  );
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
-  const processFile = useCallback((file: File) => {
-    if (!file.type.startsWith("image/")) return;
+  const processFile = (file: File) => {
     setImageName(file.name);
+    setFileType(file.type);
     const reader = new FileReader();
-    reader.onload = (e) => {
-      setImageBase64(e.target?.result as string);
-    };
+    reader.onload = (e) => setImageBase64(e.target?.result as string);
     reader.readAsDataURL(file);
-  }, []);
+  };
 
-  const handleFileSelect = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) processFile(file);
-    },
-    [processFile]
-  );
-
-  const removeImage = useCallback(() => {
+  const clearFile = () => {
     setImageBase64(null);
     setImageName(null);
-  }, []);
+    setFileType(null);
+  };
 
-  return (
-    <div className="space-y-3">
-      {imageBase64 && (
-        <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl">
-          <img
-            src={imageBase64}
-            alt="Preview"
-            className="w-16 h-16 rounded-lg object-cover"
-          />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm text-white truncate">{imageName}</p>
-            <p className="text-xs text-zinc-500">Ready to analyze</p>
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const isImage = fileType?.startsWith("image/");
+  const fileExtension = imageName?.split(".").pop()?.toUpperCase() || "FILE";
+
+return (
+    <div className="relative bg-[#1f1f1f] border border-white/10 rounded-3xl shadow-xl focus-within:border-white/20 transition-all">
+      {/* File Preview Area - Sits above the text */}
+      {(imageBase64 || imageName) && (
+        <div className="flex flex-wrap gap-2 px-5 pt-4">
+          <div className="group relative flex items-center gap-3 p-2 bg-[#2f2f2f] border border-white/10 rounded-2xl w-fit max-w-[200px] animate-in fade-in slide-in-from-bottom-2">
+            {isImage ? (
+              <img src={imageBase64 || undefined} alt="Preview" className="w-10 h-10 rounded-lg object-cover" />
+            ) : (
+              <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-blue-400" />
+              </div>
+            )}
+            <div className="flex flex-col min-w-0 pr-6">
+              <span className="text-xs font-medium text-white truncate">{imageName || "Document"}</span>
+              <span className="text-[10px] text-zinc-500">{fileExtension}</span>
+            </div>
+            <button 
+              onClick={clearFile}
+              className="absolute -top-2 -right-2 bg-zinc-800 border border-white/10 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <X className="w-3 h-3 text-white" />
+            </button>
           </div>
-          <button
-            onClick={removeImage}
-            className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
         </div>
       )}
 
-      <div className="relative flex items-end gap-2 px-2 py-2">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-          className="hidden"
-        />
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-full transition-colors shrink-0"
-          title="Attach image"
-        >
-          <ImageIcon className="w-5 h-5" />
-        </button>
+      {/* Text Input Area */}
+      <textarea
+        ref={textareaRef}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        className="w-full bg-transparent px-5 pt-5 pb-14 text-white placeholder-zinc-500 focus:outline-none resize-none min-h-[100px] max-h-60"
+        onInput={(e) => {
+          const target = e.target as HTMLTextAreaElement;
+          target.style.height = "auto";
+          target.style.height = `${target.scrollHeight}px`;
+        }}
+      />
 
-        <div className="flex-1 relative">
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={imageBase64 ? "Describe what you want to know..." : placeholder}
-            className={`w-full bg-transparent px-4 py-3 pr-12 text-sm text-white placeholder-zinc-500 focus:outline-none resize-none min-h-[24px] max-h-40 ${hasLeftPadding ? 'pl-28' : ''}`}
-            rows={1}
-            style={{
-              height: "auto",
-              overflow: "hidden",
-            }}
-            onInput={(e) => {
-              const target = e.target as HTMLTextAreaElement;
-              target.style.height = "auto";
-              target.style.height = Math.min(target.scrollHeight, 160) + "px";
-            }}
-          />
+      {/* 2. Gemini-style Bottom Toolbar */}
+      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {/* Image/Plus Button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="p-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            <input ref={fileInputRef} type="file" onChange={handleFileChange} className="hidden" />
+          </button>
+
+          {/* Tools Button (Optional visual) */}
+          <button className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-colors text-sm">
+            <span className="text-xs font-medium">Tools</span>
+          </button>
         </div>
 
-        <button
-          onClick={handleSend}
-          disabled={!input.trim() && !imageBase64 && !isStreaming}
-          className={`p-2 rounded-full transition-all shrink-0 ${
-            isStreaming
-              ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
-              : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600 disabled:opacity-30 disabled:cursor-not-allowed"
-          }`}
-        >
-          {isStreaming ? (
-            <Square className="w-4 h-4" />
-          ) : (
-            <Send className="w-4 h-4" />
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Model Selector (Styled like Gemini's "Fast/Advanced" dropdown) */}
+          <select
+            value={selectedModel}
+            onChange={(e) => setSelectedModel(e.target.value)}
+            className="bg-transparent text-zinc-400 text-xs px-2 py-1 cursor-pointer focus:outline-none hover:text-white transition-colors"
+          >
+            {models.map((m: any) => (
+              <option key={m.id} value={m.id} className="bg-[#1f1f1f]">
+                {m.label.split("—")[0]}
+              </option>
+            ))}
+          </select>
+
+          {/* Send Button */}
+          <button
+            onClick={handleSend}
+            disabled={!input.trim() && !isStreaming}
+            className="p-2 text-zinc-400 hover:text-white disabled:opacity-20 transition-colors"
+          >
+            {isStreaming ? <Square className="w-5 h-5" /> : <Send className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
     </div>
   );

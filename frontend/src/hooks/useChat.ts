@@ -13,6 +13,8 @@ export interface LocalMessage {
   content: string;
   model?: string;
   imageBase64?: string | null;
+  imageName?: string | null;
+  fileType?: string | null;
   createdAt: number;
   isStreaming?: boolean;
 }
@@ -35,7 +37,9 @@ interface UseChatReturn {
     content: string,
     model: string,
     chatId: string | null,
-    imageBase64?: string | null
+    imageBase64?: string | null,
+    imageName?: string | null,
+    fileType?: string | null
   ) => Promise<void>;
   stopStreaming: () => void;
 }
@@ -60,7 +64,9 @@ export function useChat(): UseChatReturn {
       content: string,
       model: string,
       chatId: string | null,
-      imageBase64?: string | null
+      imageBase64?: string | null,
+      imageName?: string | null,
+      fileType?: string | null
     ) => {
       if (!content.trim() && !imageBase64) return;
 
@@ -73,6 +79,8 @@ export function useChat(): UseChatReturn {
         role: "user",
         content: content.trim(),
         imageBase64: imageBase64 || null,
+        imageName: imageName || null,
+        fileType: fileType || null,
         createdAt: Date.now(),
       };
 

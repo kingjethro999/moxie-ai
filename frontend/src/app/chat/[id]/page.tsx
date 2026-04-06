@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { 
-  Menu, 
-  X, 
+import {
+  Menu,
+  X,
   ChevronDown,
   Crown,
   LogOut,
@@ -169,11 +169,10 @@ function ChatContent() {
                 <button
                   key={chat.id}
                   onClick={() => handleSelectChat(chat.id)}
-                  className={`w-full text-left px-3 py-2.5 text-sm rounded-xl transition-colors ${
-                    activeChatId === chat.id
+                  className={`w-full text-left px-3 py-2.5 text-sm rounded-xl transition-colors ${activeChatId === chat.id
                       ? "bg-white/10 text-white"
                       : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-                  }`}
+                    }`}
                 >
                   <span className="block truncate">{chat.title}</span>
                 </button>
@@ -184,22 +183,22 @@ function ChatContent() {
 
         {/* Bottom Section */}
         <div className="p-3 border-t border-white/10">
-          <button 
+          <button
             onClick={() => setSettingsOpen(true)}
             className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-400 hover:bg-white/5 hover:text-zinc-300 rounded-xl transition-colors"
           >
             <Settings className="w-5 h-5" />
             Settings
           </button>
-          
-          <button 
+
+          <button
             onClick={handleSignOut}
             className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-400 hover:bg-white/5 hover:text-zinc-300 rounded-xl transition-colors mt-1"
           >
             <LogOut className="w-5 h-5" />
             Log out
           </button>
-          
+
           {user && (
             <div className="flex items-center gap-3 mt-2 px-3 py-2">
               <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-zinc-300">
@@ -224,7 +223,7 @@ function ChatContent() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            
+
             <button className="flex items-center gap-2 px-3 py-1.5 text-lg font-medium text-zinc-100 hover:bg-white/10 rounded-lg transition-colors">
               Moxie
               <ChevronDown className="w-4 h-4 text-zinc-500" />
@@ -283,36 +282,20 @@ function ChatContent() {
         )}
 
         {/* Input Bar with Model Selector */}
+        {/* // Inside page.tsx - Simplify this section */}
         <div className="shrink-0 px-4 pb-6 pt-2">
           <div className="max-w-3xl mx-auto">
-            <div className="relative bg-[#1f1f1f] rounded-full border border-white/10 hover:border-white/20 transition-colors">
-              {/* Model Selector - inside input like Claude */}
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value)}
-                  className="bg-zinc-800 text-zinc-300 text-xs px-3 py-1.5 rounded-full focus:outline-none hover:bg-zinc-700 transition-colors cursor-pointer border border-white/10"
-                >
-                  {models.map((model) => (
-                    <option key={model.id} value={model.id} className="bg-[#1a1a1a]">
-                      {model.label.split("—")[0].trim()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <ChatInput
-                onSend={handleSend}
-                onStop={stopStreaming}
-                isStreaming={isStreaming}
-                isVisionModel={isVisionModel}
-                selectedModel={selectedModel}
-                placeholder="Ask Moxie anything..."
-                hasLeftPadding={true}
-              />
-            </div>
-            <p className="text-center text-xs text-zinc-600 mt-3">
-              Moxie may display inaccurate info. Double-check important responses.
-            </p>
+            <ChatInput
+              onSend={handleSend}
+              onStop={stopStreaming}
+              isStreaming={isStreaming}
+              isVisionModel={isVisionModel}
+              // Pass the model list and setter to the component
+              models={models}
+              selectedModel={selectedModel}
+              setSelectedModel={setSelectedModel}
+              placeholder="Ask Moxie anything..."
+            />
           </div>
         </div>
 
@@ -322,14 +305,14 @@ function ChatContent() {
             <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
               <div className="flex items-center justify-between p-4 border-b border-white/10">
                 <h2 className="text-lg font-semibold">Settings</h2>
-                <button 
+                <button
                   onClick={() => setSettingsOpen(false)}
                   className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              
+
               <div className="p-4 space-y-6">
                 {/* System Prompt Setting */}
                 <div>
