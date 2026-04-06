@@ -185,3 +185,41 @@ export async function validateHashedApiKey(
 
   return null;
 }
+
+export interface ApiKey {
+  id: string;
+  userId: string;
+  createdAt: number;
+  active: boolean;
+  lastUsed: number | null;
+}
+
+/**
+ * Get all API keys for a user
+ */
+export async function getUserApiKeys(userId: string): Promise<ApiKey[]> {
+  const keysRef = ref(database, "api_keys");
+  const snapshot = await get(keysRef);
+
+  if (!snapshot.exists()) return [];
+
+  const keys: ApiKey[] = [];
+  snapshot.forEach((child) => {
+    const data = child.val();
+    if (data.userId === userId) {
+      keys.push({
+        id: child.key!,
+        ...data,
+      });
+    }
+  });
+
+  return keys.sort((a, b) => b.createdAt - a.createdAt);
+}
+
+/**
+ * Delete an API key
+ */
+export async function deleteApiKey(hashedKey: string): Promise<void> {
+  await remove(ref(database, `api_keys/${hashedKey}`));
+}

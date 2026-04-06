@@ -33,22 +33,20 @@ export async function POST(request: NextRequest) {
     const { messages, model: requestedModel, image, stream: wantStream = true } = body;
 
     const apiKey = request.headers.get("x-api-key");
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "Authentication required. Please provide x-api-key header." },
-        { status: 401 }
-      );
-    }
+    
+    // If API key provided, validate it (external API access)
+    if (apiKey) {
+      const hashedKey = crypto.createHash("sha256").update(apiKey).digest("hex");
+      const authUser = await validateHashedApiKey(hashedKey);
 
-    const hashedKey = crypto.createHash("sha256").update(apiKey).digest("hex");
-    const authUser = await validateHashedApiKey(hashedKey);
-
-    if (!authUser) {
-      return NextResponse.json(
-        { error: "Invalid API key. Please generate a new one." },
-        { status: 401 }
-      );
+      if (!authUser) {
+        return NextResponse.json(
+          { error: "Invalid API key. Please generate a new one." },
+          { status: 401 }
+        );
+      }
     }
+    // If no API key, request is from web UI (Firebase Auth session handles auth)
 
     if (!messages || messages.length === 0) {
       return NextResponse.json(
@@ -83,7 +81,6 @@ export async function POST(request: NextRequest) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": apiKey,
         },
         body: JSON.stringify({
           model,
@@ -109,7 +106,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
+        ...(apiKey && { "x-api-key": apiKey }),
       },
       body: JSON.stringify({
         model,

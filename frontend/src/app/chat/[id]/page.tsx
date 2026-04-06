@@ -10,6 +10,7 @@ import {
   LogOut,
   Settings,
   Plus,
+  Key,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
@@ -21,6 +22,7 @@ import ChatInput from "@/components/chat/ChatInput";
 import { AuthGuard } from "@/components/AuthGuard";
 import { useAuthStore } from "@/stores/authStore";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function ChatPage() {
   return (
@@ -124,7 +126,7 @@ function ChatContent() {
 
   const handleSignOut = useCallback(async () => {
     await signOut();
-    router.push("/login");
+    router.push("/auth/login");
   }, [signOut, router]);
 
   return (
@@ -329,6 +331,21 @@ function ChatContent() {
                   <p className="text-xs text-zinc-600 mt-2">
                     This defines how Moxie introduces itself and responds to you.
                   </p>
+                </div>
+
+                {/* API Keys Link */}
+                <div className="pt-4 border-t border-zinc-800">
+                  <Link
+                    href="/keys"
+                    onClick={() => setSettingsOpen(false)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded-lg transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Key className="w-5 h-5 text-zinc-500" />
+                      <span>API Keys</span>
+                    </div>
+                    <span className="text-xs text-zinc-500">Manage API access</span>
+                  </Link>
                 </div>
 
                 {/* Logout Button */}
