@@ -2,6 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { database } from "@/lib/firebase";
 import { ref, set } from "firebase/database";
+import admin from "firebase-admin";
+
+// Initialize Firebase Admin if not already done
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "moxie-ai-d8063",
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || "https://moxie-ai-d8063-default-rtdb.firebaseio.com/",
+  });
+}
 
 /**
  * POST /api/keys/generate
@@ -9,11 +22,17 @@ import { ref, set } from "firebase/database";
  */
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await request.json();
-
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Get Firebase auth token from Authorization header
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Authorization header required" }, { status: 401 });
     }
+
+    const token = authHeader.split(" ")[1];
+    
+    // Verify the token and get user
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const userId = decodedToken.uid;
 
     // 1. Generate a raw key: moxie-XXXX-XXXX-XXXX-XXXX
     const bytes = crypto.randomBytes(16).toString("hex");

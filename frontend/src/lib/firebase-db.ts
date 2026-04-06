@@ -199,19 +199,22 @@ export interface ApiKey {
  */
 export async function getUserApiKeys(userId: string): Promise<ApiKey[]> {
   const keysRef = ref(database, "api_keys");
-  const snapshot = await get(keysRef);
+  // Must use query with equalTo to satisfy Firebase security rules
+  const userKeysQuery = query(
+    keysRef,
+    orderByChild("userId"),
+    equalTo(userId)
+  );
+  const snapshot = await get(userKeysQuery);
 
   if (!snapshot.exists()) return [];
 
   const keys: ApiKey[] = [];
   snapshot.forEach((child) => {
-    const data = child.val();
-    if (data.userId === userId) {
-      keys.push({
-        id: child.key!,
-        ...data,
-      });
-    }
+    keys.push({
+      id: child.key!,
+      ...child.val(),
+    });
   });
 
   return keys.sort((a, b) => b.createdAt - a.createdAt);

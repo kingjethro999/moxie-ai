@@ -34,10 +34,15 @@ export default function KeysPage() {
     if (!user || generating) return;
     setGenerating(true);
     try {
+      // Get Firebase auth token
+      const token = await user.getIdToken();
+      
       const response = await fetch("/api/keys/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid }),
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
       });
       const data = await response.json();
       if (data.key) {
