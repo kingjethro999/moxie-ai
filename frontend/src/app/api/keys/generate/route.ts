@@ -8,11 +8,11 @@ import admin from "firebase-admin";
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "moxie-ai-d8063",
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      projectId: "moxie-ai-d8063",
+      clientEmail: "firebase-adminsdk-fbsvc@moxie-ai-d8063.iam.gserviceaccount.com",
+      privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC4uQgKlqexPYri\n7ZeJz9FptSfvj6TxwaKS7T5p7JMJo5prrHSrhHITZyUEYxxl8X7xLYf4facvYR+8\nSCZ8i6GpMlEY9amWuk0pGC84uRxwOLbtyHlbHQtvWnvy7KWAIPtccSrj/vKPVUA9\n6GN+Ss+MaXXc3r8JLM+QdSiQZCCJ2nnVYvtKP8gtd3euTM4FVrLLhS53vqarY1JE\nOh+SmQ2u+/5txV/59JMzoo4s3K9wTVr8QrJ3jSvM2DXbzbtLe5v24UZCQSsgFqQ0\n+6u5Kz0/eC/fOB/c71OCNGpGl7ayx695GiKCbx6mK8SGX4mJB/LXE3o4JMTrizGC\nAiJFDqZJAgMBAAECggEADqHmlYsjT7aJq8npCvs9sgdN+WuqI9XkOkoFe4fISndN\nlkmoCMWiMTAGlkNBFsCzXuityITwkz/Y7xXSiaNYbBIOq0DbfRN3JQITzIUaT/fo\nIqwSk+F4PEsBPkgZYI3MR4F15a9WeLzmrLi9t912dR+N/O/el1wXuZBURSLPUogL\nviYA8suIlXiY6AhXEFGd6xCIxCMnu44PjyhRHuZ1iuml7jOmhbusmCgZ7mbaURJj\nMEdbtxk6MBK+ZJ7pWuopLZ23T+C+2jB1aiKbbS/JBxau//J/834kkcGeRYk8287V\njWCW7LIi+GMHmE+uf2wu/tfuUizvUFaAkGvSkdYF4QKBgQDozvNHz/NQvvB6trF7\nAxvehfHHybX4XRVyMm+uD9LEApVAjn8f5SwTwnvlhhnTJMJ4i6ApW2Y18tzSOeFC\nNLfjPDe1RwjIMpqkvaWf64TW1ORUbujV7Vp673pzepqfK5NwmHiFXBe+8csUaJxw\nFL7kFEMYGes8aG2h4ZGEbfjvIQKBgQDLH87NP083K8xoZPazrAdY9oL4SQI4n5gE\nahdO1u29m4CbkgKNNjatP9dUO/xHyB1OKtr2N1UYvNXh6pVFZkFu6Cu2PqJEhHIT\nJkozrsUXvPl/k0W4lM+UkedMpgejPZ7HrCMjDNTUQoVqFO8QmPV1Wry/rvNeQAwQ\n6mumFgcaKQKBgE9ff4JUW9iDwOmVsB0Iik/ryusa0nfDBLTSjVEDBBDf8JL6Ak2V\njNmPzT4L4nIibks7D3gKOWbbTn4+TZaM8sT+mt+rQEtBNYhFQFqtqbS1EMPYrHmD\nWv3e+Bi3DFCIQtR4p16Qb2gid+KVaACukgahAd8Nty35TKeMiFhmRiEBAoGAUEiH\nJWqDdcvy48QcGhHBabEtPNMmdJjnrb787WVX3BxNLa/9IDEwVTOpeRqocPqwUofv\nuWdPVBK2+q8MRrzO2fYb6NFCs5Ahwl3c8CaAsgw4FOtxoC35CcDNSedJl4SwcD0i\nOiVFLYwJTU9u2gGK6tJtTdnpSPRJkJoG6ENGlVkCgYEAuYfDhvQGv9HDrLPlNphe\nSp/pxdWhZcSTz73FfE3Vg4CADa5129KMjFPZfcJqrvRAnVZx4oyBpxPuBc4r8O65\nh8086vCV/xIh2Q/8+j4UBXs6oZ70eoa1SsupCfQZX3UmSmMCB1hyQ7/RUTn1N77h\nF9bxnfYVFe8rIg1Sxd8lQb0=\n-----END PRIVATE KEY-----",
     }),
-    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || "https://moxie-ai-d8063-default-rtdb.firebaseio.com/",
+    databaseURL: "https://moxie-ai-d8063-default-rtdb.firebaseio.com/",
   });
 }
 
