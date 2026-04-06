@@ -8,6 +8,7 @@ import {
   update,
   query,
   orderByChild,
+  equalTo,
 } from "firebase/database";
 
 // ---- Types ----
@@ -18,6 +19,7 @@ export interface ChatMessage {
   content: string;
   model?: string;
   imageBase64?: string | null;
+  thinking?: string;
   createdAt: number;
 }
 
@@ -62,16 +64,19 @@ export async function createChat(
  */
 export async function getUserChats(userId: string): Promise<Chat[]> {
   const chatsRef = ref(database, "chats");
-  const snapshot = await get(query(chatsRef, orderByChild("userId")));
+  // Must use query with equalTo to satisfy Firebase security rules
+  const userChatsQuery = query(
+    chatsRef,
+    orderByChild("userId"),
+    equalTo(userId)
+  );
+  const snapshot = await get(userChatsQuery);
 
   if (!snapshot.exists()) return [];
 
   const chats: Chat[] = [];
   snapshot.forEach((child) => {
-    const chat = child.val() as Chat;
-    if (chat.userId === userId) {
-      chats.push(chat);
-    }
+    chats.push(child.val() as Chat);
   });
 
   // Sort by updatedAt descending
@@ -86,7 +91,8 @@ export async function addMessage(
   role: "user" | "assistant",
   content: string,
   model?: string,
-  imageBase64?: string | null
+  imageBase64?: string | null,
+  thinking?: string
 ): Promise<string> {
   const messagesRef = ref(database, `messages/${chatId}`);
   const newMsgRef = push(messagesRef);
@@ -98,6 +104,7 @@ export async function addMessage(
     content,
     model: model || undefined,
     imageBase64: imageBase64 || null,
+    thinking: thinking || undefined,
     createdAt: Date.now(),
   };
 

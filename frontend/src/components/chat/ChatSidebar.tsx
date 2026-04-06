@@ -48,7 +48,7 @@ export default function ChatSidebar({
         </span>
         <button
           onClick={onNewChat}
-          className="p-1 text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.08] rounded transition-colors"
+          className="p-1 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded transition-colors"
           title="New Chat"
         >
           <Plus className="w-4 h-4" />
@@ -60,7 +60,7 @@ export default function ChatSidebar({
         {/* New Chat CTA */}
         <button
           onClick={onNewChat}
-          className="flex items-center gap-2 w-full text-left px-2 py-2 text-sm font-medium text-indigo-400 hover:bg-indigo-500/10 rounded-md transition-colors border border-dashed border-indigo-500/30"
+          className="flex items-center gap-2 w-full text-left px-2 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors border border-dashed border-zinc-700"
         >
           <Plus className="w-4 h-4" />
           <span>New Chat</span>
@@ -71,13 +71,13 @@ export default function ChatSidebar({
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-7 bg-white/[0.04] rounded animate-pulse"
+                className="h-7 bg-zinc-800 rounded animate-pulse"
               />
             ))}
           </div>
         ) : chats.length === 0 ? (
-          <div className="text-center py-8 text-xs text-zinc-500">
-            <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-30" />
+          <div className="text-center py-8 text-xs text-zinc-600">
+            <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-20" />
             <p>No chats yet.</p>
             <p>Start a new conversation!</p>
           </div>
@@ -128,7 +128,7 @@ function ChatGroup({
 
   return (
     <div>
-      <div className="text-[10px] text-zinc-600 uppercase tracking-wider px-2 mb-1 font-medium">
+      <div className="text-[10px] text-zinc-700 uppercase tracking-wider px-2 mb-1 font-medium">
         {label}
       </div>
       <div className="flex flex-col gap-0.5">
@@ -139,19 +139,19 @@ function ChatGroup({
               key={chat.id}
               className={`group flex items-center gap-2 w-full text-left text-xs py-1.5 px-2 rounded cursor-pointer transition-colors ${
                 isActive
-                  ? "text-indigo-400 bg-indigo-500/10"
-                  : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
+                  ? "text-zinc-200 bg-zinc-800"
+                  : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50"
               }`}
               onClick={() => onSelectChat(chat.id)}
             >
-              <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-60" />
+              <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-50" />
               <span className="truncate flex-1">{chat.title}</span>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onDeleteChat(chat.id);
                 }}
-                className="opacity-0 group-hover:opacity-100 p-0.5 text-zinc-500 hover:text-red-400 transition-all"
+                className="opacity-0 group-hover:opacity-100 p-0.5 text-zinc-600 hover:text-zinc-400 transition-all"
               >
                 <Trash2 className="w-3 h-3" />
               </button>

@@ -11,6 +11,8 @@ export interface LocalMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
+  thinking?: string;
+  thinkingComplete?: boolean;
   model?: string;
   imageBase64?: string | null;
   imageName?: string | null;
@@ -147,6 +149,8 @@ export function useChat(): UseChatReturn {
 
         const decoder = new TextDecoder();
         let fullContent = "";
+        let fullThinking = "";
+        let inThinkingPhase = true;
 
         while (true) {
           const { done, value } = await reader.read();
@@ -159,14 +163,30 @@ export function useChat(): UseChatReturn {
             try {
               const parsed = JSON.parse(line);
 
-              if (parsed.token) {
-                fullContent += parsed.token;
+              if (parsed.token || parsed.thinking) {
+                // Handle thinking content
+                if (parsed.thinking) {
+                  fullThinking += parsed.thinking;
+                }
+                
+                // Handle main content - once we get content, thinking phase is over
+                if (parsed.token) {
+                  if (inThinkingPhase && fullThinking) {
+                    inThinkingPhase = false;
+                  }
+                  fullContent += parsed.token;
+                }
 
                 // Update the assistant message in real-time
                 setMessages((prev) =>
                   prev.map((m) =>
                     m.id === assistantId
-                      ? { ...m, content: fullContent }
+                      ? { 
+                          ...m, 
+                          content: fullContent,
+                          thinking: fullThinking,
+                          thinkingComplete: !inThinkingPhase && parsed.done,
+                        }
                       : m
                   )
                 );
@@ -197,7 +217,7 @@ export function useChat(): UseChatReturn {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
-              ? { ...m, content: fullContent, isStreaming: false }
+              ? { ...m, content: fullContent, thinking: fullThinking, thinkingComplete: true, isStreaming: false }
               : m
           )
         );
@@ -205,7 +225,7 @@ export function useChat(): UseChatReturn {
         // 7. Save assistant response to Firebase
         if (chatId && fullContent) {
           try {
-            await saveMessage(chatId, "assistant", fullContent, model);
+            await saveMessage(chatId, "assistant", fullContent, model, undefined, fullThinking);
           } catch (err) {
             console.error("Failed to save assistant message:", err);
           }

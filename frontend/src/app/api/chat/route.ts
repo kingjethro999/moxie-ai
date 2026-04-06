@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
 
-    const stream = new ReadableStream({
+    const stream = new ReadableStream<Uint8Array>({
       async start(controller) {
         try {
           while (true) {
@@ -159,10 +159,15 @@ export async function POST(request: NextRequest) {
                 try {
                   const parsed = JSON.parse(dataStr);
                   const content = parsed.choices?.[0]?.delta?.content || "";
+                  const reasoning = parsed.choices?.[0]?.delta?.reasoning_content || "";
 
-                  if (content) {
+                  if (content || reasoning) {
                     controller.enqueue(
-                      encoder.encode(JSON.stringify({ token: content, done: false }) + "\n")
+                      encoder.encode(JSON.stringify({ 
+                        token: content, 
+                        thinking: reasoning,
+                        done: false 
+                      }) + "\n")
                     );
                   }
                 } catch {
@@ -179,7 +184,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return new Response(stream, {
+    return new NextResponse(stream, {
       headers: {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",

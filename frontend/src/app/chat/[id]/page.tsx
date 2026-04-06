@@ -96,6 +96,7 @@ function ChatContent() {
           role: m.role,
           content: m.content,
           model: m.model,
+          thinking: m.thinking,
           imageBase64: m.imageBase64 || null,
           createdAt: m.createdAt,
           isStreaming: false,
@@ -127,16 +128,16 @@ function ChatContent() {
   }, [signOut, router]);
 
   return (
-    <div className="flex h-screen bg-[#1a1a1a] text-white overflow-hidden">
+    <div className="flex h-screen bg-[#030303] text-zinc-300 overflow-hidden">
       {/* Sidebar */}
       <aside
-        className={`${sidebarOpen ? "w-72" : "w-0"} bg-[#1a1a1a] border-r border-white/10 flex flex-col transition-all duration-200 overflow-hidden shrink-0`}
+        className={`${sidebarOpen ? "w-72" : "w-0"} bg-[#030303] border-r border-zinc-800 flex flex-col transition-all duration-200 overflow-hidden shrink-0`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-3">
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+            className="p-2 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -146,7 +147,7 @@ function ChatContent() {
         <div className="px-3 pb-2">
           <button
             onClick={handleNewChat}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-300 hover:bg-white/10 rounded-xl transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-400 hover:bg-zinc-800 rounded-xl transition-colors"
           >
             <Plus className="w-5 h-5" />
             New chat
@@ -158,7 +159,7 @@ function ChatContent() {
           {chatsLoading ? (
             <div className="space-y-2">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-10 bg-white/5 rounded-lg animate-pulse" />
+                <div key={i} className="h-10 bg-zinc-800 rounded-lg animate-pulse" />
               ))}
             </div>
           ) : chats.length === 0 ? (
@@ -170,8 +171,8 @@ function ChatContent() {
                   key={chat.id}
                   onClick={() => handleSelectChat(chat.id)}
                   className={`w-full text-left px-3 py-2.5 text-sm rounded-xl transition-colors ${activeChatId === chat.id
-                      ? "bg-white/10 text-white"
-                      : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                      ? "bg-zinc-800 text-zinc-100"
+                      : "text-zinc-500 hover:bg-zinc-800/50 hover:text-zinc-300"
                     }`}
                 >
                   <span className="block truncate">{chat.title}</span>
@@ -182,10 +183,10 @@ function ChatContent() {
         </div>
 
         {/* Bottom Section */}
-        <div className="p-3 border-t border-white/10">
+        <div className="p-3 border-t border-zinc-800">
           <button
             onClick={() => setSettingsOpen(true)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-400 hover:bg-white/5 hover:text-zinc-300 rounded-xl transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 rounded-xl transition-colors"
           >
             <Settings className="w-5 h-5" />
             Settings
@@ -193,7 +194,7 @@ function ChatContent() {
 
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-400 hover:bg-white/5 hover:text-zinc-300 rounded-xl transition-colors mt-1"
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 rounded-xl transition-colors mt-1"
           >
             <LogOut className="w-5 h-5" />
             Log out
@@ -201,11 +202,11 @@ function ChatContent() {
 
           {user && (
             <div className="flex items-center gap-3 mt-2 px-3 py-2">
-              <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-zinc-300">
+              <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-medium text-zinc-400">
                 {user.email?.[0]?.toUpperCase() || "U"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-zinc-300 truncate">{user.email}</p>
+                <p className="text-sm text-zinc-400 truncate">{user.email}</p>
               </div>
             </div>
           )}
@@ -213,26 +214,26 @@ function ChatContent() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 bg-[#0d0d0d] relative">
+      <main className="flex-1 flex flex-col min-w-0 bg-[#030303] relative">
         {/* Header */}
         <header className="flex items-center justify-between px-4 py-3 shrink-0">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+              className="p-2 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded-full transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
 
-            <button className="flex items-center gap-2 px-3 py-1.5 text-lg font-medium text-zinc-100 hover:bg-white/10 rounded-lg transition-colors">
+            <button className="flex items-center gap-2 px-3 py-1.5 text-lg font-medium text-zinc-200 hover:bg-zinc-800 rounded-lg transition-colors">
               Moxie
-              <ChevronDown className="w-4 h-4 text-zinc-500" />
+              <ChevronDown className="w-4 h-4 text-zinc-600" />
             </button>
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm text-zinc-400 hover:text-zinc-200 hover:bg-white/10 rounded-lg transition-colors">
-              <Crown className="w-4 h-4 text-yellow-500" />
+            <button className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors">
+              <Crown className="w-4 h-4 text-zinc-500" />
               Upgrade
             </button>
           </div>
@@ -255,13 +256,13 @@ function ChatContent() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-medium text-white">Moxie</span>
-                        <span className="text-xs text-zinc-500">thinking...</span>
+                        <span className="text-sm font-medium text-zinc-200">Moxie</span>
+                        <span className="text-xs text-zinc-600">thinking...</span>
                       </div>
                       <div className="flex gap-1">
-                        <span className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <span className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <span className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                        <span className="w-2 h-2 bg-zinc-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="w-2 h-2 bg-zinc-600 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="w-2 h-2 bg-zinc-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
                     </div>
                   </div>
@@ -301,13 +302,13 @@ function ChatContent() {
 
         {/* Settings Modal */}
         {settingsOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
-                <h2 className="text-lg font-semibold">Settings</h2>
+          <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+            <div className="bg-[#0a0a0a] border border-zinc-800 rounded-xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
+              <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+                <h2 className="text-lg font-semibold text-zinc-200">Settings</h2>
                 <button
                   onClick={() => setSettingsOpen(false)}
-                  className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                  className="p-2 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded-full transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -316,25 +317,25 @@ function ChatContent() {
               <div className="p-4 space-y-6">
                 {/* System Prompt Setting */}
                 <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-2">
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
                     Moxie Profile / System Prompt
                   </label>
                   <textarea
                     value={systemPrompt}
                     onChange={(e) => setSystemPrompt(e.target.value)}
-                    className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-white/20 resize-none min-h-[100px]"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 placeholder-zinc-600 focus:outline-none focus:border-zinc-700 resize-none min-h-[100px]"
                     placeholder="Describe how Moxie should behave..."
                   />
-                  <p className="text-xs text-zinc-500 mt-2">
+                  <p className="text-xs text-zinc-600 mt-2">
                     This defines how Moxie introduces itself and responds to you.
                   </p>
                 </div>
 
                 {/* Logout Button */}
-                <div className="pt-4 border-t border-white/10">
+                <div className="pt-4 border-t border-zinc-800">
                   <button
                     onClick={handleSignOut}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 text-zinc-300 rounded-lg hover:bg-zinc-700 transition-colors"
                   >
                     <LogOut className="w-5 h-5" />
                     Log out
@@ -355,8 +356,8 @@ function EmptyState({ onNewChat }: { onNewChat: () => void }) {
       <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mb-6 overflow-hidden">
         <Image src="/icon.png" alt="Moxie" width={64} height={64} className="object-cover" />
       </div>
-      <h1 className="text-3xl font-semibold text-white mb-3">Good afternoon</h1>
-      <p className="text-zinc-500 text-base max-w-md mb-8">
+      <h1 className="text-3xl font-semibold text-zinc-200 mb-3">Good afternoon</h1>
+      <p className="text-zinc-600 text-base max-w-md mb-8">
         Ask Moxie anything about code, debug errors, or just chat.
       </p>
     </div>
