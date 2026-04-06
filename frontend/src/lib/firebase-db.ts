@@ -104,7 +104,7 @@ export async function addMessage(
     content,
     model: model || undefined,
     imageBase64: imageBase64 || null,
-    thinking: thinking || undefined,
+    ...(thinking && { thinking }),
     createdAt: Date.now(),
   };
 

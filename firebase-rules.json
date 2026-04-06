@@ -11,8 +11,8 @@
       }
     },
     "messages": {
-      ".indexOn": ["createdAt"],
       "$chatId": {
+        ".indexOn": ["createdAt"],
         ".read": "auth != null && root.child('chats/' + $chatId + '/userId').val() === auth.uid",
         ".write": "auth != null && root.child('chats/' + $chatId + '/userId').val() === auth.uid"
       }
