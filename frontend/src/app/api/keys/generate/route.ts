@@ -22,17 +22,22 @@ if (!admin.apps.length) {
  */
 export async function POST(request: NextRequest) {
   try {
+    console.log("API key generation request received");
+    
     // Get Firebase auth token from Authorization header
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      console.log("Missing or invalid Authorization header");
       return NextResponse.json({ error: "Authorization header required" }, { status: 401 });
     }
 
     const token = authHeader.split(" ")[1];
+    console.log("Token received, attempting to verify");
     
     // Verify the token and get user
     const decodedToken = await admin.auth().verifyIdToken(token);
     const userId = decodedToken.uid;
+    console.log("Token verified for user:", userId);
 
     // 1. Generate a raw key: moxie-XXXX-XXXX-XXXX-XXXX
     const bytes = crypto.randomBytes(16).toString("hex");
@@ -43,6 +48,7 @@ export async function POST(request: NextRequest) {
     const hashedKey = crypto.createHash("sha256").update(rawKey).digest("hex");
 
     // 3. Store the hash in Firebase
+    console.log("Storing API key in Firebase");
     await set(ref(database, `api_keys/${hashedKey}`), {
       userId: userId,
       createdAt: Date.now(),
@@ -51,12 +57,17 @@ export async function POST(request: NextRequest) {
     });
 
     // 4. Return the RAW key to the user (ONLY THIS ONCE)
+    console.log("API key generated successfully");
     return NextResponse.json({
       key: rawKey,
       note: "Save this key now. It will not be shown again."
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Key generation error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("Error stack:", error.stack);
+    return NextResponse.json({ 
+      error: "Internal server error",
+      details: error.message 
+    }, { status: 500 });
   }
 }
